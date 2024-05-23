@@ -1,0 +1,450 @@
+using System.ComponentModel;
+using System.Text.Json;
+using System.Diagnostics;
+
+namespace ProjectDiary;
+
+public partial class Form1 : Form
+{
+    List<LocationObject> locations = new List<LocationObject>();
+
+    BindingList<LocationObject> bindingList;
+    public List<String> hashTags = new List<string>();
+
+    const string XYplorer = @"C:\Program Files (x86)\XYplorer\XYplorer.exe";
+
+    string locationsFile;
+
+    public string selectedTagsFromTagForm;
+
+    private LocationObject currentLocation;
+
+
+    public Form1()
+    {
+        InitializeComponent();
+
+        datagridviewLocations.AutoGenerateColumns = false;
+
+        string docsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+        locationsFile = Path.Combine(docsFolder, "locations.json");
+
+        panelAddButtons.Location = panelUpdateButtons.Location;
+
+        if (File.Exists(locationsFile))
+        {
+            readSavedLocations(locationsFile);
+        }
+    }
+
+    private void clearFilter()
+    {
+        locations = locations.OrderBy(o => o.ShortName).ToList();
+        bindingList = new BindingList<LocationObject>(locations);
+        datagridviewLocations.DataSource = bindingList;
+    }
+
+    private void setFilter(string filter)
+    {
+        List<LocationObject> filteredList = new List<LocationObject>();
+
+        filteredList = locations.Where(l => (l.ShortName.ToLower() + l.Hashtags.ToLower() + l.Description.ToLower()).Contains(filter.ToLower().Trim()))
+                             .OrderBy(o => o.ShortName).ToList();
+        bindingList = new BindingList<LocationObject>(filteredList);
+        datagridviewLocations.DataSource = bindingList;
+    }
+
+    private void readSavedLocations(string inputFile)
+    {
+        string jsonString = File.ReadAllText(inputFile);
+        locations = JsonSerializer.Deserialize<List<LocationObject>>(jsonString);
+        locations = locations.OrderBy(o => o.ShortName).ToList();
+
+        bindingList = new BindingList<LocationObject>(locations);
+        datagridviewLocations.DataSource = bindingList;
+
+        GetHashTags();
+    }
+
+    private void saveLocations()
+    {
+        clearFilter();
+        saveLocationsToDisk();
+    }
+
+    private void saveLocationsToDisk()
+    { 
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        var jsonString = JsonSerializer.Serialize(locations, options);
+
+        File.WriteAllText(locationsFile, jsonString);
+    }
+
+    public void GetHashTags()
+    {
+        hashTags.Clear();
+        foreach (var loc in locations)
+        {
+            string[] tokens = loc.Hashtags.Split(" ", StringSplitOptions.TrimEntries);
+            foreach (var token in tokens)
+            {
+                if (!hashTags.Contains(token))
+                {
+                    if (token.Trim().Length > 0) hashTags.Add(token);
+                }
+            }
+        }
+        hashTags.Sort(StringComparer.CurrentCulture);
+    }
+
+    private void Form1_Load(object sender, EventArgs e)
+    {
+    }
+
+    private LocationObject getLocationObjectByLocation(string location)
+    {
+        LocationObject loc = locations.SingleOrDefault(loc => loc.Location == location);
+        return loc;
+
+    }
+
+    private void refreshDetailPanel()
+    {
+        textboxDescription.Text = currentLocation.Description;
+        textboxHashtags.Text = currentLocation.Hashtags;
+        textboxName.Text = currentLocation.ShortName;
+        textboxLocation.Text = currentLocation.Location;
+        textboxUrl.Text = currentLocation.Url;
+    }
+
+    private void datagridviewLocations_RowEnter(object sender, DataGridViewCellEventArgs e)
+    {
+        string location = datagridviewLocations.Rows[e.RowIndex].Cells["col_Location"].FormattedValue.ToString();
+        currentLocation = getLocationObjectByLocation(location);
+
+        refreshDetailPanel();
+    }
+
+    private void toggleReadOnlyStatus()
+    {
+        textboxDescription.ReadOnly = !textboxDescription.ReadOnly;
+        textboxHashtags.ReadOnly = !textboxHashtags.ReadOnly;
+        textboxName.ReadOnly = !textboxName.ReadOnly;
+        textboxLocation.ReadOnly = !textboxLocation.ReadOnly;
+        textboxUrl.ReadOnly = !textboxUrl.ReadOnly;
+
+        if (linklabelUpdateMode.Tag.ToString() == "enable")
+        {
+            textboxName.Focus();
+            linklabelUpdateMode.Text = "Cancel update";
+            linklabelUpdateMode.Tag = "disable";
+            buttonUpdate.Enabled = true;
+            textboxDescription.BackColor = Color.WhiteSmoke;
+            textboxHashtags.BackColor = Color.WhiteSmoke;
+            textboxName.BackColor = Color.WhiteSmoke;
+            textboxLocation.BackColor = Color.WhiteSmoke;
+            textboxUrl.BackColor = Color.WhiteSmoke;
+            textboxDescription.TabStop = true;
+            textboxHashtags.TabStop = true;
+            textboxName.TabStop = true;
+            textboxLocation.TabStop = true;
+            textboxUrl.TabStop = true;
+
+            datagridviewLocations.Enabled = false;
+            linklabelFilter.Enabled = false;
+
+        }
+        else
+        {
+            linklabelUpdateMode.Text = "Enable update";
+            linklabelUpdateMode.Tag = "enable";
+            buttonUpdate.Enabled = false;
+            textboxDescription.BackColor = Color.LightGoldenrodYellow;
+            textboxHashtags.BackColor = Color.LightGoldenrodYellow;
+            textboxName.BackColor = Color.LightGoldenrodYellow;
+            textboxLocation.BackColor = Color.LightGoldenrodYellow;
+            textboxUrl.BackColor = Color.LightGoldenrodYellow;
+
+            textboxDescription.TabStop = false;
+            textboxHashtags.TabStop = false;
+            textboxName.TabStop = false;
+            textboxLocation.TabStop = false;
+            textboxUrl.TabStop = false;
+
+            datagridviewLocations.Enabled = true;
+            linklabelFilter.Enabled = true;
+        }
+    }
+
+    private bool IsLocationRegistered(string newLocation)
+    {
+        var existingLocation = locations.SingleOrDefault(loc => loc.Location == newLocation);
+
+        return existingLocation != null;
+    }
+
+    private void buttonAddOrUpdate_Click(object sender, EventArgs e)
+    {
+    }
+
+    private void Form1_DragDrop(object sender, DragEventArgs e)
+    {
+        if (linklabelFilter.Text != "Filter")
+        {
+            MessageBox.Show("Clear filter before adding a location.");
+            return;
+        }
+        
+        //toggleReadOnlyStatus();
+
+        string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+        string file = files[0];
+
+        bool pathRegistered = IsLocationRegistered(file);
+        if (pathRegistered)
+        {
+            MessageBox.Show("already registered");
+            return;
+        }
+
+        textboxDescription.Text = "";
+        textboxHashtags.Text = "";
+        textboxName.Text = "";
+        textboxUrl.Text = "";
+        textboxLocation.Text = file;
+        textboxName.Focus();
+
+        toggleReadOnlyStatus();
+
+        toggleAddUpdatePanels();
+    }
+
+    private void toggleAddUpdatePanels()
+    {
+        panelUpdateButtons.Visible = !panelUpdateButtons.Visible;
+        panelAddButtons.Visible = !panelAddButtons.Visible;
+    }
+
+    private void Form1_DragEnter(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+    }
+
+    private void linklabelUpdateMode_LinkClicked_1(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        if (linklabelFilter.Text != "Filter")
+        {
+            MessageBox.Show("Clear filter before updating.");
+            return;
+        }
+        toggleReadOnlyStatus();
+    }
+
+    private void buttonUpdate_Click(object sender, EventArgs e)
+    {
+        if (buttonUpdate.Tag.ToString() == "update")
+        {
+            currentLocation.Description = textboxDescription.Text;
+            currentLocation.Hashtags = textboxHashtags.Text;
+            currentLocation.ShortName = textboxName.Text;
+            currentLocation.Location = textboxLocation.Text;
+            currentLocation.Url = textboxUrl.Text;
+
+            toggleReadOnlyStatus();
+            saveLocationsToDisk();
+        }
+    }
+
+    private void buttonAdd_Click(object sender, EventArgs e)
+    {
+        LocationObject loc = new LocationObject();
+        loc.Description = textboxDescription.Text;
+        loc.Hashtags = textboxHashtags.Text;
+        loc.ShortName = textboxName.Text;
+        loc.Location = textboxLocation.Text;
+        loc.Url = textboxUrl.Text;
+        loc.DateAdded = DateTime.Now;
+
+        locations.Add(loc);
+        locations = locations.OrderBy(o => o.ShortName).ToList();
+        bindingList = new BindingList<LocationObject>(locations);
+        datagridviewLocations.DataSource = bindingList;
+
+        //textboxName.Text = "";
+        //textboxDescription.Text = "";
+        //textboxHashtags.Text = "";
+        //textboxLocation.Text = "";
+
+        saveLocations();
+        toggleReadOnlyStatus();
+        toggleAddUpdatePanels();
+        selectRowWithLocation(loc.Location);
+        currentLocation = loc;
+        refreshDetailPanel();
+        // Scroll selected row into view.
+        datagridviewLocations.FirstDisplayedScrollingRowIndex = datagridviewLocations.SelectedRows[0].Index;
+    }
+
+    private void linklabelCancelAdd_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        toggleAddUpdatePanels();
+        refreshDetailPanel();
+    }
+
+    private void textboxHashtags_Click(object sender, EventArgs e)
+    {
+        getTagsFromDialog();
+    }
+
+    private void getTagsFromDialog()
+    {
+        if (textboxHashtags.ReadOnly) return;
+
+        GetHashTags();
+
+        List<String> ht = hashTags;
+
+        FormTags ft = new FormTags(this);
+        ft.Left = this.Left + this.Width - 20;
+        ft.Top = this.Top;
+
+        if (ft.ShowDialog() == DialogResult.OK)
+        {
+            textboxHashtags.Text = selectedTagsFromTagForm;
+            textboxDescription.Focus();
+        }
+        else
+        {
+            //textboxHashtags.Text = "";
+        }
+    }
+
+    public void selectRowWithLocation(string targetPath)
+    {
+        //string targetPath = @"C:\Users\thumb\Documents\programming\client\page-structure";
+
+        foreach (DataGridViewRow row in datagridviewLocations.Rows)
+        {
+            string location = row.Cells["col_Location"].FormattedValue.ToString();
+            if (location == targetPath)
+            {
+                row.Selected = true;
+                return;
+            }
+        }
+
+        datagridviewLocations.Rows[0].Selected = true;
+    }
+
+    private void launchProcess(string command, string argument)
+    {
+        ProcessLauncher pl = new ProcessLauncher();
+        pl.LaunchProcess(command, argument, wait: false);
+    }
+
+    private void linklabelOpenLocation_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        launchProcess(XYplorer, currentLocation.Location);
+    }
+
+    private void linklabelFilter_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        if (linklabelFilter.Text == "Filter")
+        {
+            setFilter(textboxFilter.Text);
+            linklabelFilter.Text = "Clear filter";
+            linklabelFilter.Left = linklabelFilter.Left - 50;
+        }
+        else
+        {
+            clearFilter();
+            linklabelFilter.Text = "Filter";
+            textboxFilter.Text = "";
+            linklabelFilter.Left = linklabelFilter.Left + 50;
+        }
+    }
+
+    private void Form1_Resize(object sender, EventArgs e)
+    {
+        if (this.WindowState == FormWindowState.Minimized)
+        {
+            Hide();
+            notifyIcon1.Visible = true;
+        }
+    }
+
+    private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+    {
+        Show();
+        this.WindowState = FormWindowState.Normal;
+        notifyIcon1.Visible = false;
+    }
+
+    private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        if (String.IsNullOrEmpty(currentLocation.Url)) return;
+
+        Process myProcess = new Process();
+
+        try
+        {
+            // true is the default, but it is important not to set it to false
+            myProcess.StartInfo.UseShellExecute = true;
+            myProcess.StartInfo.FileName = currentLocation.Url;
+            myProcess.Start();
+        }
+        catch (Exception ee)
+        {
+            MessageBox.Show(ee.Message);
+        }
+    }
+
+    private void validateLocations()
+    { 
+        foreach (DataGridViewRow row in datagridviewLocations.Rows)
+        {
+            string location = row.Cells["col_Location"].FormattedValue.ToString();
+            if (!Directory.Exists(location) && !File.Exists(location))
+            {
+                row.Cells["col_flagged"].Value = "*";
+            }
+        }
+    }
+
+    private void validateLocationsToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        validateLocations();
+    }
+
+    private void deleteCurrentRowToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        DialogResult dr = MessageBox.Show("Are sure you want to the selected row?",
+                      "Confirm row delettion", MessageBoxButtons.YesNo);
+        switch (dr)
+        {
+            case DialogResult.Yes:
+                locations.Remove(currentLocation);
+                saveLocations();
+                readSavedLocations(locationsFile);
+                break;
+            case DialogResult.No:
+                break;
+        }
+    }
+
+    private void textboxHashtags_KeyDown(object sender, KeyEventArgs e)
+    {
+        getTagsFromDialog();
+    }
+
+    private void textboxFilter_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    private void panel1_Paint(object sender, PaintEventArgs e)
+    {
+
+    }
+}
