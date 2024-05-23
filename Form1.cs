@@ -139,12 +139,14 @@ public partial class Form1 : Form
     {
         searchValue = searchValue.Trim();
 
-        List<Catalog> filteredList; 
+        List<Catalog> filteredList;
 
-        if (searchValue.StartsWith("#")) {
+        if (searchValue.StartsWith("#"))
+        {
             filteredList = await repo.SearchForTags(searchValue);
         }
-        else {
+        else
+        {
             filteredList = await repo.SearchCatalogRows(searchValue);
         }
 
@@ -196,10 +198,10 @@ public partial class Form1 : Form
         else results = await repo.GetAllCatalogRowsByShortName();
 
         catalogList = results.ToList();
-       
+
         foreach (var item in catalogList)
         {
-            item.ShortName = item.ShortName + "   " + item.Tags;            
+            item.ShortName = item.ShortName + " |  " + item.Tags;
         }
 
         favoritesManager.AddFavoritesToMenu(catalogList);
@@ -236,13 +238,22 @@ public partial class Form1 : Form
         return loc;
     }
 
-    private void refreshDetailPanel()
+    private async Task refreshDetailPanel()
     {
-        textboxDescription.Text = currentCatalog.Description;
+        Catalog loc = await repo.GetCatalogByLocation(currentCatalog.Location);
+
+        //Catalog loc = catalogList.SingleOrDefault(loc => loc.Location == currentCatalog.Location);
+
+
+        textboxDescription.Text = currentCatalog.Description;        
         textboxHashtags.Text = currentCatalog.Tags;
-        textboxName.Text = currentCatalog.ShortName;
+        textboxName.Text = loc.ShortName;
+        //textboxName.Text = currentCatalog.ShortName;
         textboxLocation.Text = currentCatalog.Location;
         textboxUrl.Text = currentCatalog.Url;
+
+
+
     }
 
     private void datagridviewLocations_RowEnter(object sender, DataGridViewCellEventArgs e)
@@ -538,11 +549,11 @@ public partial class Form1 : Form
                 Toast.ToastDuration.SHORT,
                 Toast.ToastStatus.ERROR,
                 true);
-            return;                
+            return;
         }
         // test for no file.
 
-        string exePath =  AppDomain.CurrentDomain.BaseDirectory;
+        string exePath = AppDomain.CurrentDomain.BaseDirectory;
         string htmlTemplateFile = Path.Join(exePath, "template.html");
 
         if (!Path.Exists(htmlTemplateFile))
@@ -553,7 +564,7 @@ public partial class Form1 : Form
                 Toast.ToastDuration.SHORT,
                 Toast.ToastStatus.ERROR,
                 true);
-            return;                
+            return;
         }
 
         string htmlTemplate = File.ReadAllText(htmlTemplateFile);
@@ -565,8 +576,8 @@ public partial class Form1 : Form
         string htmlFromMarkdown = Markdown.ToHtml(markdown, pipeline);
 
         string fullHtml = htmlTemplate.Replace("{html}", htmlFromMarkdown);
-                
-        var tempFilePath = Path.Combine(Path.GetTempPath(),"text.html");
+
+        var tempFilePath = Path.Combine(Path.GetTempPath(), "text.html");
         File.WriteAllText(tempFilePath, fullHtml);
 
         await launcher(CHROME, tempFilePath);
@@ -912,5 +923,20 @@ public partial class Form1 : Form
         {
             datagridviewLocations.Cursor = Cursors.Default;
         }
+    }
+
+    private void textboxUrl_DragDrop(object sender, DragEventArgs e)
+    {
+        if (textboxLocation.ReadOnly) return;
+
+        string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+        string file = files[0];
+
+        textboxUrl.Text = file;
+    }
+
+    private void textboxUrl_DragEnter(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
     }
 }

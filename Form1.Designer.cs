@@ -43,7 +43,6 @@
             col_location = new DataGridViewTextBoxColumn();
             panel1 = new Panel();
             linklabelOpenLocation = new LinkLabel();
-            linkLabel1 = new LinkLabel();
             panelUpdateButtons = new Panel();
             buttonUpdate = new Button();
             linklabelUpdateMode = new LinkLabel();
@@ -51,15 +50,15 @@
             linklabelCancelAdd = new LinkLabel();
             buttonAdd = new Button();
             textboxLocation = new TextBox();
-            textboxUrl = new TextBox();
             label4 = new Label();
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
-            label5 = new Label();
             textboxDescription = new TextBox();
             textboxHashtags = new TextBox();
             textboxName = new TextBox();
+            linkLabel1 = new LinkLabel();
+            label5 = new Label();
             textboxFilter = new TextBox();
             linklabelFilter = new LinkLabel();
             notifyIcon1 = new NotifyIcon(components);
@@ -72,6 +71,7 @@
             toolStripSeparator1 = new ToolStripSeparator();
             makeLocationAFavoriteToolStripMenuItem = new ToolStripMenuItem();
             manageFavoritesToolStripMenuItem = new ToolStripMenuItem();
+            textboxUrl = new TextBox();
             ((System.ComponentModel.ISupportInitialize)datagridviewLocations).BeginInit();
             panel1.SuspendLayout();
             panelUpdateButtons.SuspendLayout();
@@ -177,17 +177,17 @@
             // 
             // panel1
             // 
-            panel1.Controls.Add(linklabelOpenLocation);
+            panel1.Controls.Add(textboxUrl);
             panel1.Controls.Add(linkLabel1);
+            panel1.Controls.Add(linklabelOpenLocation);
             panel1.Controls.Add(panelUpdateButtons);
             panel1.Controls.Add(panelAddButtons);
             panel1.Controls.Add(textboxLocation);
-            panel1.Controls.Add(textboxUrl);
+            panel1.Controls.Add(label5);
             panel1.Controls.Add(label4);
             panel1.Controls.Add(label3);
             panel1.Controls.Add(label2);
             panel1.Controls.Add(label1);
-            panel1.Controls.Add(label5);
             panel1.Controls.Add(textboxDescription);
             panel1.Controls.Add(textboxHashtags);
             panel1.Controls.Add(textboxName);
@@ -208,19 +208,6 @@
             linklabelOpenLocation.TabStop = true;
             linklabelOpenLocation.Text = "Open location";
             linklabelOpenLocation.LinkClicked += linklabelOpenLocation_LinkClicked;
-            // 
-            // linkLabel1
-            // 
-            linkLabel1.AutoSize = true;
-            linkLabel1.LinkColor = Color.WhiteSmoke;
-            linkLabel1.Location = new Point(87, 944);
-            linkLabel1.Margin = new Padding(2, 0, 2, 0);
-            linkLabel1.Name = "linkLabel1";
-            linkLabel1.Size = new Size(109, 25);
-            linkLabel1.TabIndex = 18;
-            linkLabel1.TabStop = true;
-            linkLabel1.Text = "Open action";
-            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
             // 
             // panelUpdateButtons
             // 
@@ -308,7 +295,7 @@
             textboxLocation.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textboxLocation.BackColor = Color.LightGoldenrodYellow;
             textboxLocation.Font = new Font("Segoe UI", 11.14286F);
-            textboxLocation.Location = new Point(3, 122);
+            textboxLocation.Location = new Point(0, 126);
             textboxLocation.Name = "textboxLocation";
             textboxLocation.ReadOnly = true;
             textboxLocation.Size = new Size(1139, 37);
@@ -316,18 +303,6 @@
             textboxLocation.TabStop = false;
             textboxLocation.DragDrop += textboxLocation_DragDrop;
             textboxLocation.DragEnter += textboxLocation_DragEnter;
-            // 
-            // textboxUrl
-            // 
-            textboxUrl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textboxUrl.BackColor = Color.LightGoldenrodYellow;
-            textboxUrl.Font = new Font("Segoe UI", 11.14286F);
-            textboxUrl.Location = new Point(0, 975);
-            textboxUrl.Name = "textboxUrl";
-            textboxUrl.ReadOnly = true;
-            textboxUrl.Size = new Size(1139, 37);
-            textboxUrl.TabIndex = 17;
-            textboxUrl.TabStop = false;
             // 
             // label4
             // 
@@ -345,7 +320,7 @@
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 11.14286F);
             label3.ForeColor = Color.WhiteSmoke;
-            label3.Location = new Point(3, 268);
+            label3.Location = new Point(3, 357);
             label3.Name = "label3";
             label3.Size = new Size(131, 31);
             label3.TabIndex = 12;
@@ -356,7 +331,7 @@
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 11.14286F);
             label2.ForeColor = Color.WhiteSmoke;
-            label2.Location = new Point(3, 176);
+            label2.Location = new Point(3, 270);
             label2.Name = "label2";
             label2.Size = new Size(59, 31);
             label2.TabIndex = 11;
@@ -374,23 +349,12 @@
             label1.TabIndex = 10;
             label1.Text = "Name";
             // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Segoe UI", 11.14286F);
-            label5.ForeColor = Color.WhiteSmoke;
-            label5.Location = new Point(3, 940);
-            label5.Name = "label5";
-            label5.Size = new Size(80, 31);
-            label5.TabIndex = 16;
-            label5.Text = "Action";
-            // 
             // textboxDescription
             // 
             textboxDescription.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textboxDescription.BackColor = Color.LightGoldenrodYellow;
             textboxDescription.Font = new Font("Segoe UI", 11.14286F);
-            textboxDescription.Location = new Point(0, 303);
+            textboxDescription.Location = new Point(0, 392);
             textboxDescription.Multiline = true;
             textboxDescription.Name = "textboxDescription";
             textboxDescription.ReadOnly = true;
@@ -404,7 +368,7 @@
             textboxHashtags.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textboxHashtags.BackColor = Color.LightGoldenrodYellow;
             textboxHashtags.Font = new Font("Segoe UI", 11.14286F);
-            textboxHashtags.Location = new Point(3, 210);
+            textboxHashtags.Location = new Point(3, 304);
             textboxHashtags.Name = "textboxHashtags";
             textboxHashtags.ReadOnly = true;
             textboxHashtags.Size = new Size(1136, 37);
@@ -425,6 +389,30 @@
             textboxName.TabIndex = 7;
             textboxName.TabStop = false;
             textboxName.Leave += textboxName_Leave;
+            // 
+            // linkLabel1
+            // 
+            linkLabel1.AutoSize = true;
+            linkLabel1.LinkColor = Color.WhiteSmoke;
+            linkLabel1.Location = new Point(113, 183);
+            linkLabel1.Margin = new Padding(2, 0, 2, 0);
+            linkLabel1.Name = "linkLabel1";
+            linkLabel1.Size = new Size(109, 25);
+            linkLabel1.TabIndex = 18;
+            linkLabel1.TabStop = true;
+            linkLabel1.Text = "Open action";
+            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Segoe UI", 11.14286F);
+            label5.ForeColor = Color.WhiteSmoke;
+            label5.Location = new Point(-2, 182);
+            label5.Name = "label5";
+            label5.Size = new Size(114, 31);
+            label5.TabIndex = 16;
+            label5.Text = "Reference";
             // 
             // textboxFilter
             // 
@@ -534,6 +522,19 @@
             manageFavoritesToolStripMenuItem.Text = "Manage favorites";
             manageFavoritesToolStripMenuItem.Click += manageFavoritesToolStripMenuItem_Click;
             // 
+            // textboxUrl
+            // 
+            textboxUrl.AllowDrop = true;
+            textboxUrl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textboxUrl.BackColor = Color.LightGoldenrodYellow;
+            textboxUrl.Font = new Font("Segoe UI", 11.14286F);
+            textboxUrl.Location = new Point(0, 216);
+            textboxUrl.Name = "textboxUrl";
+            textboxUrl.ReadOnly = true;
+            textboxUrl.Size = new Size(1142, 37);
+            textboxUrl.TabIndex = 18;
+            textboxUrl.TabStop = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -588,7 +589,6 @@
         private LinkLabel linklabelFilter;
         private NotifyIcon notifyIcon1;
         private LinkLabel linkLabel1;
-        private TextBox textboxUrl;
         private Label label5;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem mainToolStripMenuItem;
@@ -602,5 +602,6 @@
         private DataGridViewTextBoxColumn col_dateAdded;
         private DataGridViewTextBoxColumn colShortName;
         private DataGridViewTextBoxColumn col_location;
+        private TextBox textboxUrl;
     }
 }
