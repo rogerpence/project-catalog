@@ -199,10 +199,10 @@ public partial class Form1 : Form
 
         catalogList = results.ToList();
 
-        foreach (var item in catalogList)
-        {
-            item.ShortName = item.ShortName + " |  " + item.Tags;
-        }
+        //foreach (var item in catalogList)
+        //{
+        //    item.ShortName = item.ShortName + " |  " + item.Tags;
+        //}
 
         favoritesManager.AddFavoritesToMenu(catalogList);
 
@@ -551,7 +551,6 @@ public partial class Form1 : Form
                 true);
             return;
         }
-        // test for no file.
 
         string exePath = AppDomain.CurrentDomain.BaseDirectory;
         string htmlTemplateFile = Path.Join(exePath, "template.html");
@@ -575,7 +574,7 @@ public partial class Form1 : Form
         string markdown = File.ReadAllText(filename);
         string htmlFromMarkdown = Markdown.ToHtml(markdown, pipeline);
 
-        string fullHtml = htmlTemplate.Replace("{html}", htmlFromMarkdown);
+        string fullHtml = htmlTemplate.Replace("{html}", htmlFromMarkdown).Replace("{title}", currentCatalog.ShortName);
 
         var tempFilePath = Path.Combine(Path.GetTempPath(), "text.html");
         File.WriteAllText(tempFilePath, fullHtml);
@@ -649,8 +648,7 @@ public partial class Form1 : Form
             else
             {
                 string args = @" -ExecutionPolicy Bypass -Command ""Start-Process PowerShell.exe -WorkingDirectory '[location]'""";
-                args = args.Replace("[location]", location);
-                await launcher("powershell.exe", args);
+                args = args.Replace("[location]", location); 
             }
         }
         else
@@ -683,18 +681,48 @@ public partial class Form1 : Form
 
     private async void linklabelOpenLocation_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-        string launchTarget = currentCatalog.Location;
+        FileAttributes attr = File.GetAttributes(currentCatalog.Location);
 
         if (Control.ModifierKeys == Keys.Control)
         {
-            string targetFolder = Path.GetDirectoryName(launchTarget);
-            if (Directory.Exists(targetFolder))
+            string folder = Path.GetDirectoryName(currentCatalog.Location);
+            
+            attr = File.GetAttributes(folder);
+
+            if (attr.HasFlag(FileAttributes.Directory))
             {
-                launchTarget = targetFolder;
+                await launcher("explorer",folder);
+                return; 
             }
         }
 
-        await launchProcess(launchTarget);
+        attr = File.GetAttributes(currentCatalog.Location);
+
+
+        if (attr.HasFlag(FileAttributes.Directory))
+        {
+            await launcher("explorer", currentCatalog.Location);
+        }
+        else
+        {
+            await launchProcess(currentCatalog.Location);
+        }
+
+
+        //string launchTarget = currentCatalog.Location;
+
+        //if (Control.ModifierKeys == Keys.Control)
+        //{
+        //    string targetFolder = Path.GetDirectoryName(launchTarget);
+        //    if (Directory.Exists(targetFolder))
+        //    {
+        //        launchTarget = targetFolder;
+        //        await launcher("explorer", targetFolder);
+        //        return;
+        //    }
+        //}
+
+        //await launchProcess(launchTarget);
     }
 
     private void linklabelFilter_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

@@ -34,14 +34,13 @@
             DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             datagridviewLocations = new DataGridView();
-            col_dateAdded = new DataGridViewTextBoxColumn();
-            colShortName = new DataGridViewTextBoxColumn();
-            col_location = new DataGridViewTextBoxColumn();
             panel1 = new Panel();
+            textboxUrl = new TextBox();
+            linkLabel1 = new LinkLabel();
             linklabelOpenLocation = new LinkLabel();
             panelUpdateButtons = new Panel();
             buttonUpdate = new Button();
@@ -50,6 +49,7 @@
             linklabelCancelAdd = new LinkLabel();
             buttonAdd = new Button();
             textboxLocation = new TextBox();
+            label5 = new Label();
             label4 = new Label();
             label3 = new Label();
             label2 = new Label();
@@ -57,8 +57,6 @@
             textboxDescription = new TextBox();
             textboxHashtags = new TextBox();
             textboxName = new TextBox();
-            linkLabel1 = new LinkLabel();
-            label5 = new Label();
             textboxFilter = new TextBox();
             linklabelFilter = new LinkLabel();
             notifyIcon1 = new NotifyIcon(components);
@@ -71,7 +69,10 @@
             toolStripSeparator1 = new ToolStripSeparator();
             makeLocationAFavoriteToolStripMenuItem = new ToolStripMenuItem();
             manageFavoritesToolStripMenuItem = new ToolStripMenuItem();
-            textboxUrl = new TextBox();
+            col_dateAdded = new DataGridViewTextBoxColumn();
+            colShortName = new DataGridViewTextBoxColumn();
+            col_location = new DataGridViewTextBoxColumn();
+            tags = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)datagridviewLocations).BeginInit();
             panel1.SuspendLayout();
             panelUpdateButtons.SuspendLayout();
@@ -100,10 +101,10 @@
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
             datagridviewLocations.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             datagridviewLocations.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            datagridviewLocations.Columns.AddRange(new DataGridViewColumn[] { col_dateAdded, colShortName, col_location });
+            datagridviewLocations.Columns.AddRange(new DataGridViewColumn[] { col_dateAdded, colShortName, col_location, tags });
             dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle5.BackColor = SystemColors.Window;
-            dataGridViewCellStyle5.Font = new Font("Segoe UI", 12F);
+            dataGridViewCellStyle5.Font = new Font("Segoe UI", 11F);
             dataGridViewCellStyle5.ForeColor = SystemColors.ControlText;
             dataGridViewCellStyle5.Padding = new Padding(5);
             dataGridViewCellStyle5.SelectionBackColor = SystemColors.Highlight;
@@ -142,39 +143,6 @@
             datagridviewLocations.DragDrop += datagridviewLocations_DragDrop;
             datagridviewLocations.DragEnter += datagridviewLocations_DragEnter;
             // 
-            // col_dateAdded
-            // 
-            col_dateAdded.DataPropertyName = "DateAdded";
-            dataGridViewCellStyle3.Format = "yyyy-MMM-dd";
-            col_dateAdded.DefaultCellStyle = dataGridViewCellStyle3;
-            col_dateAdded.HeaderText = "Added";
-            col_dateAdded.MinimumWidth = 9;
-            col_dateAdded.Name = "col_dateAdded";
-            col_dateAdded.ReadOnly = true;
-            col_dateAdded.Width = 225;
-            // 
-            // colShortName
-            // 
-            colShortName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            colShortName.DataPropertyName = "ShortName";
-            dataGridViewCellStyle4.Font = new Font("Segoe UI", 12F);
-            dataGridViewCellStyle4.Padding = new Padding(5);
-            colShortName.DefaultCellStyle = dataGridViewCellStyle4;
-            colShortName.HeaderText = "Name";
-            colShortName.MinimumWidth = 8;
-            colShortName.Name = "colShortName";
-            colShortName.ReadOnly = true;
-            // 
-            // col_location
-            // 
-            col_location.DataPropertyName = "location";
-            col_location.HeaderText = "Location";
-            col_location.MinimumWidth = 8;
-            col_location.Name = "col_location";
-            col_location.ReadOnly = true;
-            col_location.Visible = false;
-            col_location.Width = 150;
-            // 
             // panel1
             // 
             panel1.Controls.Add(textboxUrl);
@@ -195,6 +163,32 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(1142, 1135);
             panel1.TabIndex = 1;
+            // 
+            // textboxUrl
+            // 
+            textboxUrl.AllowDrop = true;
+            textboxUrl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textboxUrl.BackColor = Color.LightGoldenrodYellow;
+            textboxUrl.Font = new Font("Segoe UI", 11.14286F);
+            textboxUrl.Location = new Point(0, 216);
+            textboxUrl.Name = "textboxUrl";
+            textboxUrl.ReadOnly = true;
+            textboxUrl.Size = new Size(1142, 37);
+            textboxUrl.TabIndex = 18;
+            textboxUrl.TabStop = false;
+            // 
+            // linkLabel1
+            // 
+            linkLabel1.AutoSize = true;
+            linkLabel1.LinkColor = Color.WhiteSmoke;
+            linkLabel1.Location = new Point(113, 183);
+            linkLabel1.Margin = new Padding(2, 0, 2, 0);
+            linkLabel1.Name = "linkLabel1";
+            linkLabel1.Size = new Size(109, 25);
+            linkLabel1.TabIndex = 18;
+            linkLabel1.TabStop = true;
+            linkLabel1.Text = "Open action";
+            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
             // 
             // linklabelOpenLocation
             // 
@@ -304,6 +298,17 @@
             textboxLocation.DragDrop += textboxLocation_DragDrop;
             textboxLocation.DragEnter += textboxLocation_DragEnter;
             // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Segoe UI", 11.14286F);
+            label5.ForeColor = Color.WhiteSmoke;
+            label5.Location = new Point(-2, 182);
+            label5.Name = "label5";
+            label5.Size = new Size(114, 31);
+            label5.TabIndex = 16;
+            label5.Text = "Reference";
+            // 
             // label4
             // 
             label4.AutoSize = true;
@@ -389,30 +394,6 @@
             textboxName.TabIndex = 7;
             textboxName.TabStop = false;
             textboxName.Leave += textboxName_Leave;
-            // 
-            // linkLabel1
-            // 
-            linkLabel1.AutoSize = true;
-            linkLabel1.LinkColor = Color.WhiteSmoke;
-            linkLabel1.Location = new Point(113, 183);
-            linkLabel1.Margin = new Padding(2, 0, 2, 0);
-            linkLabel1.Name = "linkLabel1";
-            linkLabel1.Size = new Size(109, 25);
-            linkLabel1.TabIndex = 18;
-            linkLabel1.TabStop = true;
-            linkLabel1.Text = "Open action";
-            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Segoe UI", 11.14286F);
-            label5.ForeColor = Color.WhiteSmoke;
-            label5.Location = new Point(-2, 182);
-            label5.Name = "label5";
-            label5.Size = new Size(114, 31);
-            label5.TabIndex = 16;
-            label5.Text = "Reference";
             // 
             // textboxFilter
             // 
@@ -522,18 +503,47 @@
             manageFavoritesToolStripMenuItem.Text = "Manage favorites";
             manageFavoritesToolStripMenuItem.Click += manageFavoritesToolStripMenuItem_Click;
             // 
-            // textboxUrl
+            // col_dateAdded
             // 
-            textboxUrl.AllowDrop = true;
-            textboxUrl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textboxUrl.BackColor = Color.LightGoldenrodYellow;
-            textboxUrl.Font = new Font("Segoe UI", 11.14286F);
-            textboxUrl.Location = new Point(0, 216);
-            textboxUrl.Name = "textboxUrl";
-            textboxUrl.ReadOnly = true;
-            textboxUrl.Size = new Size(1142, 37);
-            textboxUrl.TabIndex = 18;
-            textboxUrl.TabStop = false;
+            col_dateAdded.DataPropertyName = "DateAdded";
+            dataGridViewCellStyle3.Format = "yyyy-MMM-dd";
+            col_dateAdded.DefaultCellStyle = dataGridViewCellStyle3;
+            col_dateAdded.HeaderText = "Added";
+            col_dateAdded.MinimumWidth = 9;
+            col_dateAdded.Name = "col_dateAdded";
+            col_dateAdded.ReadOnly = true;
+            col_dateAdded.Width = 225;
+            // 
+            // colShortName
+            // 
+            colShortName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            colShortName.DataPropertyName = "ShortName";
+            dataGridViewCellStyle4.Font = new Font("Segoe UI", 12F);
+            dataGridViewCellStyle4.Padding = new Padding(5);
+            colShortName.DefaultCellStyle = dataGridViewCellStyle4;
+            colShortName.HeaderText = "Name";
+            colShortName.MinimumWidth = 8;
+            colShortName.Name = "colShortName";
+            colShortName.ReadOnly = true;
+            // 
+            // col_location
+            // 
+            col_location.DataPropertyName = "location";
+            col_location.HeaderText = "Location";
+            col_location.MinimumWidth = 8;
+            col_location.Name = "col_location";
+            col_location.ReadOnly = true;
+            col_location.Visible = false;
+            col_location.Width = 150;
+            // 
+            // tags
+            // 
+            tags.DataPropertyName = "tags";
+            tags.HeaderText = "Tags";
+            tags.MinimumWidth = 8;
+            tags.Name = "tags";
+            tags.ReadOnly = true;
+            tags.Width = 400;
             // 
             // Form1
             // 
@@ -549,7 +559,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Name = "Form1";
-            Text = "Project Catalog v10.0.4";
+            Text = "Project Catalog v10.0.5";
             FormClosing += Form1_FormClosing;
             Load += Form1_Load;
             Resize += Form1_Resize;
@@ -599,9 +609,10 @@
         public ToolStripMenuItem menuItemFavorites;
         private ToolStripMenuItem makeLocationAFavoriteToolStripMenuItem;
         private ToolStripMenuItem refeshListToolStripMenuItem;
+        private TextBox textboxUrl;
         private DataGridViewTextBoxColumn col_dateAdded;
         private DataGridViewTextBoxColumn colShortName;
         private DataGridViewTextBoxColumn col_location;
-        private TextBox textboxUrl;
+        private DataGridViewTextBoxColumn tags;
     }
 }
