@@ -623,7 +623,7 @@ public partial class Form1 : Form
             }
         }
 
-        switch (extension)
+        switch (extension.ToLower())
         {
             case ".sln":
                 if (File.Exists(location))
@@ -633,12 +633,21 @@ public partial class Form1 : Form
                 }
                 break;
 
+            case ".exe":
+                await launcher(location);
+                found = true;
+                break;
+
             case ".pdf":
+                string target = "\"" + location + "\"";
+                await launcher(CHROME, target);
+                found = true;
                 break;
 
             case ".md":
                 await processMarkdownFile(location);
-                return;
+                found = true;
+                break;
         }
         if (found) return;
 
@@ -652,6 +661,7 @@ public partial class Form1 : Form
 
         if (Path.Exists(location))
         {
+            // Launch PowerShell terminal and run PowerShell script.
             string ext = Path.GetExtension(location.ToLower());
             if (ext == ".ps1")
             {
@@ -664,7 +674,7 @@ public partial class Form1 : Form
                 args.Add(cmdline);
                 await launcher("powershell.exe", args);
             }
-
+            // Launch PowerShell terminal.
             else
             {
                 string args = @" -ExecutionPolicy Bypass -Command ""Start-Process PowerShell.exe -WorkingDirectory '[location]'""";
@@ -674,7 +684,7 @@ public partial class Form1 : Form
         else
         {
             showToast("Search failed",
-                      $"This location can't be found: {location}",
+                      $"This location can't be processed: {location}",
                       Toast.ToastPosition.LOWER_LEFT,
                       Toast.ToastDuration.SHORT,
                       Toast.ToastStatus.ERROR,
@@ -699,13 +709,49 @@ public partial class Form1 : Form
             .ExecuteAsync();
     }
 
+
+
+
     private async void linklabelOpenLocation_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-        FileAttributes attr = File.GetAttributes(currentCatalog.Location);
+        await LaunchLocationOrReference(currentCatalog.Location);
+
+        //FileAttributes attr = File.GetAttributes(currentCatalog.Location);
+
+        //if (Control.ModifierKeys == Keys.Control)
+        //{
+        //    string folder = Path.GetDirectoryName(currentCatalog.Location);
+
+        //    attr = File.GetAttributes(folder);
+
+        //    if (attr.HasFlag(FileAttributes.Directory))
+        //    {
+        //        await launcher("explorer", folder);
+        //        return;
+        //    }
+        //}
+
+        //attr = File.GetAttributes(currentCatalog.Location);
+
+
+        //if (attr.HasFlag(FileAttributes.Directory))
+        //{
+        //    await launcher("explorer", currentCatalog.Location);
+        //}
+        //else
+        //{
+        //    await launchProcess(currentCatalog.Location);
+        //}
+    }
+
+
+    private async Task LaunchLocationOrReference(string commandLine)
+    {
+        FileAttributes attr;
 
         if (Control.ModifierKeys == Keys.Control)
         {
-            string folder = Path.GetDirectoryName(currentCatalog.Location);
+            string folder = Path.GetDirectoryName(commandLine);
 
             attr = File.GetAttributes(folder);
 
@@ -716,18 +762,26 @@ public partial class Form1 : Form
             }
         }
 
-        attr = File.GetAttributes(currentCatalog.Location);
-
-
-        if (attr.HasFlag(FileAttributes.Directory))
+        try
         {
-            await launcher("explorer", currentCatalog.Location);
+            attr = File.GetAttributes(commandLine);
+            if (attr.HasFlag(FileAttributes.Directory))
+            {
+                await launcher("explorer", commandLine);
+            }
+            else
+            {
+                await launchProcess(commandLine);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            await launchProcess(currentCatalog.Location);
         }
+
+        await launchProcess(commandLine);
     }
+
+
 
     private void linklabelFilter_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
@@ -768,7 +822,8 @@ public partial class Form1 : Form
 
     private async void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-        await launchProcess(textboxUrl.Text);
+        //await launchProcess(textboxUrl.Text);
+        await LaunchLocationOrReference(textboxUrl.Text);
     }
 
     private void validateLocations()
@@ -971,7 +1026,7 @@ public partial class Form1 : Form
 
     private void textboxUrl_DragDrop(object sender, DragEventArgs e)
     {
-        if (textboxLocation.ReadOnly) return;
+        if (textboxUrl.ReadOnly) return;
 
         string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
         string file = files[0];
@@ -986,7 +1041,7 @@ public partial class Form1 : Form
 
     private async void Form1_KeyDown(object sender, KeyEventArgs e)
     {
-      if (e.KeyCode == Keys.Escape)
+        if (e.KeyCode == Keys.Escape)
         {
             // Handle Escape key press
             //MessageBox.Show("Escape key pressed!");
@@ -994,4 +1049,5 @@ public partial class Form1 : Form
             await clearFilter();
         }
     }
+
 }

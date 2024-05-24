@@ -218,6 +218,8 @@
             textboxUrl.Size = new Size(1142, 37);
             textboxUrl.TabIndex = 18;
             textboxUrl.TabStop = false;
+            textboxUrl.DragDrop += textboxUrl_DragDrop;
+            textboxUrl.DragEnter += textboxUrl_DragEnter;
             // 
             // linkLabel1
             // 
@@ -498,21 +500,21 @@
             // validateLocationsToolStripMenuItem
             // 
             validateLocationsToolStripMenuItem.Name = "validateLocationsToolStripMenuItem";
-            validateLocationsToolStripMenuItem.Size = new Size(270, 34);
+            validateLocationsToolStripMenuItem.Size = new Size(259, 34);
             validateLocationsToolStripMenuItem.Text = "Validate locations";
             validateLocationsToolStripMenuItem.Click += validateLocationsToolStripMenuItem_Click;
             // 
             // deleteCurrentRowToolStripMenuItem
             // 
             deleteCurrentRowToolStripMenuItem.Name = "deleteCurrentRowToolStripMenuItem";
-            deleteCurrentRowToolStripMenuItem.Size = new Size(270, 34);
+            deleteCurrentRowToolStripMenuItem.Size = new Size(259, 34);
             deleteCurrentRowToolStripMenuItem.Text = "Delete current row";
             deleteCurrentRowToolStripMenuItem.Click += deleteCurrentRowToolStripMenuItem_Click;
             // 
             // refeshListToolStripMenuItem
             // 
             refeshListToolStripMenuItem.Name = "refeshListToolStripMenuItem";
-            refeshListToolStripMenuItem.Size = new Size(270, 34);
+            refeshListToolStripMenuItem.Size = new Size(259, 34);
             refeshListToolStripMenuItem.Text = "Refesh list";
             refeshListToolStripMenuItem.Click += refeshListToolStripMenuItem_Click;
             // 
@@ -559,7 +561,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Name = "Form1";
-            Text = "Project Catalog v10.0.7";
+            Text = "Project Catalog v10.0.8";
             FormClosing += Form1_FormClosing;
             Load += Form1_Load;
             KeyDown += Form1_KeyDown;
