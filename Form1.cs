@@ -34,6 +34,8 @@ public partial class Form1 : Form
 
     Repository repo;
 
+    int currentGridRowIndex = 0;
+
     public Form1()
     {
         InitializeComponent();
@@ -50,7 +52,10 @@ public partial class Form1 : Form
 
         // Overlay add and update buttons (only one shows at a time).
         panelAddButtons.Location = panelUpdateButtons.Location;
+
+        this.KeyPreview = true; // Ensure the form receives key events
     }
+
 
     public async Task updateLocation(Catalog catalog)
     {
@@ -79,12 +84,12 @@ public partial class Form1 : Form
         //MessageBox.Show("location deleted");
         await repo.Delete<Catalog>(catalog);
 
-        showToast("Delete successful",
-                    $"{catalog.ShortName} deleted",
-                    Toast.ToastPosition.LOWER_LEFT,
-                    Toast.ToastDuration.SHORT,
-                    Toast.ToastStatus.SUCCESS,
-                    true);
+        //showToast("Delete successful",
+        //            $"{catalog.ShortName} deleted",
+        //            Toast.ToastPosition.LOWER_LEFT,
+        //            Toast.ToastDuration.SHORT,
+        //            Toast.ToastStatus.SUCCESS,
+        //            true);
 
     }
 
@@ -100,9 +105,6 @@ public partial class Form1 : Form
         }
 
         var results = await repo.Upsert<Catalog>(catalog);
-
-
-        //MessageBox.Show("Just did an insert");
     }
 
     public async void OnFavoriteClicked(object sender, EventArgs e)
@@ -114,11 +116,13 @@ public partial class Form1 : Form
         Catalog cat = await repo.GetCatalogByLocation(mi.Tag.ToString());
 
         currentCatalog = cat;
-        refreshDetailPanel();
+        await refreshDetailPanel();
     }
 
-    private void clearFilter()
+    private async Task clearFilter()
     {
+        if (linklabelFilter.Text == "Filter") return;
+
         string savedLocation = currentCatalog.Location;
 
         catalogList = catalogList.OrderByDescending(o => o.Dateadded).ToList();
@@ -132,7 +136,7 @@ public partial class Form1 : Form
         textboxFilter.Text = "";
         //linklabelFilter.Left = linklabelFilter.Left + 50;
 
-        refreshDetailPanel();
+        await refreshDetailPanel();
     }
 
     private async void setFilter(string searchValue)
@@ -242,26 +246,22 @@ public partial class Form1 : Form
     {
         Catalog loc = await repo.GetCatalogByLocation(currentCatalog.Location);
 
-        //Catalog loc = catalogList.SingleOrDefault(loc => loc.Location == currentCatalog.Location);
-
-
-        textboxDescription.Text = currentCatalog.Description;        
+        textboxDescription.Text = currentCatalog.Description;
         textboxHashtags.Text = currentCatalog.Tags;
         textboxName.Text = loc.ShortName;
         //textboxName.Text = currentCatalog.ShortName;
         textboxLocation.Text = currentCatalog.Location;
         textboxUrl.Text = currentCatalog.Url;
-
-
-
     }
 
-    private void datagridviewLocations_RowEnter(object sender, DataGridViewCellEventArgs e)
+    private async void datagridviewLocations_RowEnter(object sender, DataGridViewCellEventArgs e)
     {
+        currentGridRowIndex = e.RowIndex;
+
         string location = datagridviewLocations.Rows[e.RowIndex].Cells["col_Location"].FormattedValue.ToString();
         currentCatalog = getCatalogObjectByLocation(location);
 
-        refreshDetailPanel();
+        await refreshDetailPanel();
     }
 
     private void toggleReadOnlyStatus()
@@ -345,18 +345,20 @@ public partial class Form1 : Form
         ItemDroppedForAdd(e);
     }
 
-    private void ItemDroppedForAdd(DragEventArgs e)
+    private async void ItemDroppedForAdd(DragEventArgs e)
     {
+
         if (linklabelFilter.Text != "Filter")
         {
-            showToast("Clear filter first",
-                      $"Clear filter before adding a location",
-                      Toast.ToastPosition.LOWER_LEFT,
-                      Toast.ToastDuration.SHORT,
-                      Toast.ToastStatus.INFO);
 
-            //MessageBox.Show("Clear filter before adding a location.");
-            return;
+            await clearFilter();
+            //showToast("Clear filter first",
+            //          $"Clear filter before adding a location",
+            //          Toast.ToastPosition.LOWER_LEFT,
+            //          Toast.ToastDuration.SHORT,
+            //          Toast.ToastStatus.INFO);
+
+            //return;
         }
 
         string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -367,7 +369,7 @@ public partial class Form1 : Form
         {
             selectRowWithLocation(existingCatalog.Location);
             currentCatalog = existingCatalog;
-            refreshDetailPanel();
+            await refreshDetailPanel();
             //MessageBox.Show("already registered");
 
             showToast("Location aleady exists",
@@ -378,6 +380,12 @@ public partial class Form1 : Form
 
             return;
         }
+
+        showToast("Adding a new item",
+                  "Enter necessary info and click 'Add'",
+                  Toast.ToastPosition.LOWER_LEFT,
+                  Toast.ToastDuration.SHORT,
+                  Toast.ToastStatus.INFO);
 
         textboxDescription.Text = "";
         textboxHashtags.Text = "";
@@ -402,16 +410,25 @@ public partial class Form1 : Form
 
     private void linklabelUpdateMode_LinkClicked_1(object sender, LinkLabelLinkClickedEventArgs e)
     {
-        if (linklabelFilter.Text != "Filter")
-        {
-            showToast("Clear filter first",
-                      $"Clear filter before updating a location",
-                      Toast.ToastPosition.LOWER_LEFT,
-                      Toast.ToastDuration.SHORT,
-                      Toast.ToastStatus.INFO);
-            return;
-        }
+        //if (linklabelFilter.Text != "Filter")
+        //{
+        //    showToast("Clear filter first",
+        //              $"Clear filter before updating a location",
+        //              Toast.ToastPosition.LOWER_LEFT,
+        //              Toast.ToastDuration.SHORT,
+        //              Toast.ToastStatus.INFO);
+        //    return;
+        //}
         toggleReadOnlyStatus();
+    }
+
+
+    private void updateRowDisplay()
+    {
+        DataGridViewRow row = datagridviewLocations.Rows[currentGridRowIndex];
+
+        row.Cells["colShortName"].Value = textboxName.Text;
+        row.Cells["tags"].Value = textboxHashtags.Text;
     }
 
     private async void buttonUpdate_Click(object sender, EventArgs e)
@@ -427,10 +444,13 @@ public partial class Form1 : Form
 
             toggleReadOnlyStatus();
 
+            updateRowDisplay();
+
             await updateLocation(currentCatalog);
 
             buttonUpdate.BackColor = Color.LightBlue;
             buttonUpdate.ForeColor = Color.Black;
+
         }
     }
 
@@ -475,16 +495,16 @@ public partial class Form1 : Form
 
         selectRowWithLocation(catalog.Location);
         currentCatalog = catalogJustAdded;
-        refreshDetailPanel();
+        await refreshDetailPanel();
     }
 
-    private void linklabelCancelAdd_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    private async void linklabelCancelAdd_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
         linklabelUpdateMode.Tag = "disable";
         toggleReadOnlyStatus();
 
         toggleAddUpdatePanels();
-        refreshDetailPanel();
+        await refreshDetailPanel();
 
         buttonUpdate.BackColor = Color.LightBlue;
         buttonUpdate.ForeColor = Color.Black;
@@ -648,7 +668,7 @@ public partial class Form1 : Form
             else
             {
                 string args = @" -ExecutionPolicy Bypass -Command ""Start-Process PowerShell.exe -WorkingDirectory '[location]'""";
-                args = args.Replace("[location]", location); 
+                args = args.Replace("[location]", location);
             }
         }
         else
@@ -686,13 +706,13 @@ public partial class Form1 : Form
         if (Control.ModifierKeys == Keys.Control)
         {
             string folder = Path.GetDirectoryName(currentCatalog.Location);
-            
+
             attr = File.GetAttributes(folder);
 
             if (attr.HasFlag(FileAttributes.Directory))
             {
-                await launcher("explorer",folder);
-                return; 
+                await launcher("explorer", folder);
+                return;
             }
         }
 
@@ -707,22 +727,6 @@ public partial class Form1 : Form
         {
             await launchProcess(currentCatalog.Location);
         }
-
-
-        //string launchTarget = currentCatalog.Location;
-
-        //if (Control.ModifierKeys == Keys.Control)
-        //{
-        //    string targetFolder = Path.GetDirectoryName(launchTarget);
-        //    if (Directory.Exists(targetFolder))
-        //    {
-        //        launchTarget = targetFolder;
-        //        await launcher("explorer", targetFolder);
-        //        return;
-        //    }
-        //}
-
-        //await launchProcess(launchTarget);
     }
 
     private void linklabelFilter_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -793,7 +797,18 @@ public partial class Form1 : Form
         if (dr == DialogResult.Yes)
         {
             await deleteCatalog(currentCatalog);
-            await readSavedLocations(true);
+
+            DataGridViewRow row = datagridviewLocations.Rows[currentGridRowIndex];
+
+            string removedShortName = row.Cells["colShortName"].Value.ToString();
+
+            datagridviewLocations.Rows.RemoveAt(currentGridRowIndex);
+
+            showToast("This row was removed:",
+                      "{removedShortName}",
+                      Toast.ToastPosition.LOWER_LEFT,
+                      Toast.ToastDuration.SHORT,
+                      Toast.ToastStatus.INFO);
         }
     }
 
@@ -909,19 +924,20 @@ public partial class Form1 : Form
         if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
     }
 
-    private void textboxLocation_DragDrop(object sender, DragEventArgs e)
+    private async void textboxLocation_DragDrop(object sender, DragEventArgs e)
     {
         if (textboxLocation.ReadOnly) return;
 
         if (linklabelFilter.Text != "Filter")
         {
-            showToast("A filter is active",
-                    $"Please clear the filter before adding a item",
-                    Toast.ToastPosition.LOWER_LEFT,
-                    Toast.ToastDuration.SHORT,
-                    Toast.ToastStatus.INFO,
-                    true);
-            return;
+            await clearFilter();
+            //showToast("A filter is active",
+            //        $"Please clear the filter before adding a item",
+            //        Toast.ToastPosition.LOWER_LEFT,
+            //        Toast.ToastDuration.SHORT,
+            //        Toast.ToastStatus.INFO,
+            //        true);
+            //return;
         }
 
         string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -966,5 +982,16 @@ public partial class Form1 : Form
     private void textboxUrl_DragEnter(object sender, DragEventArgs e)
     {
         if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+    }
+
+    private async void Form1_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (e.KeyCode == Keys.Escape)
+        {
+            // Handle Escape key press
+            //MessageBox.Show("Escape key pressed!");
+            e.Handled = true; // Indicate that the key press has been handled
+            await clearFilter();
+        }
     }
 }

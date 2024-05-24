@@ -39,14 +39,8 @@ public class Repository : RepositoryBase
         var results = await this.Query<Catalog>(sql);
 
         var searchResults = results.ToList();
-        foreach (var item in searchResults)
-        {
-            item.ShortName = item.ShortName + "   " + item.Tags;            
-        }
+
         return searchResults;
-
-
-        //return results.ToList();
     }
 
     public async Task<List<Catalog>> SearchForTags(string searchString)
