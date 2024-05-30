@@ -10,6 +10,7 @@ using System.Diagnostics.Metrics;
 using CliWrap;
 using System.Diagnostics;
 using Markdig;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ProjectDiary;
 
@@ -31,6 +32,8 @@ public partial class Form1 : Form
     private Catalog currentCatalog;
 
     private FavoritesManager favoritesManager;
+
+    private bool isControlPressed = false;
 
     Repository repo;
 
@@ -337,7 +340,15 @@ public partial class Form1 : Form
 
     private void Form1_DragEnter(object sender, DragEventArgs e)
     {
-        if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        if (e.Data.GetDataPresent(DataFormats.FileDrop) ||
+               e.Data.GetDataPresent(DataFormats.Text) ||
+               e.Data.GetDataPresent(DataFormats.UnicodeText))
+        {
+            e.Effect = DragDropEffects.Copy;
+        }
+        
+
+        //if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
     }
 
     private void Form1_DragDrop(object sender, DragEventArgs e)
@@ -361,8 +372,18 @@ public partial class Form1 : Form
             //return;
         }
 
-        string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-        string file = files[0];
+        string file = "";
+
+        if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            file = files[0];
+        }
+
+        if (e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent(DataFormats.UnicodeText))
+        {
+            string url = (string)e.Data.GetData(DataFormats.Text);
+            file = url;
+        }
 
         Catalog existingCatalog = IsCatalogRegistered(file);
         if (existingCatalog is not null)
@@ -387,16 +408,23 @@ public partial class Form1 : Form
                   Toast.ToastDuration.SHORT,
                   Toast.ToastStatus.INFO);
 
+        setAddItemMode();
+        textboxLocation.Text = file;
+    }
+
+    private void setAddItemMode()
+    {
         textboxDescription.Text = "";
         textboxHashtags.Text = "";
         textboxName.Text = "";
         textboxUrl.Text = "";
-        textboxLocation.Text = file;
-        textboxName.Focus();
+        textboxLocation.Text = "";
 
         toggleReadOnlyStatus();
 
         toggleAddUpdatePanels();
+
+        textboxName.Focus();
     }
 
     private void toggleAddUpdatePanels()
@@ -419,6 +447,18 @@ public partial class Form1 : Form
         //              Toast.ToastStatus.INFO);
         //    return;
         //}
+
+        LinkLabel lbl = (LinkLabel)sender;
+
+        if (lbl.Text.ToLower().Contains("cancel"))
+        {
+            buttonUpdate.Visible = false;
+        }
+        else
+        {
+            buttonUpdate.Visible = true;
+        }
+
         toggleReadOnlyStatus();
     }
 
@@ -450,7 +490,7 @@ public partial class Form1 : Form
 
             buttonUpdate.BackColor = Color.LightBlue;
             buttonUpdate.ForeColor = Color.Black;
-
+            buttonUpdate.Visible = false;
         }
     }
 
@@ -504,6 +544,19 @@ public partial class Form1 : Form
         toggleReadOnlyStatus();
 
         toggleAddUpdatePanels();
+
+        LinkLabel lbl = (LinkLabel)sender;
+
+        if (lbl.Text.ToLower().Contains("cancel"))
+        {
+            buttonAdd.Visible = false;
+        }
+        else
+        {
+            buttonAdd.Visible = true;
+        }
+
+
         await refreshDetailPanel();
 
         buttonUpdate.BackColor = Color.LightBlue;
@@ -623,29 +676,34 @@ public partial class Form1 : Form
             }
         }
 
+        string target;
+
         switch (extension.ToLower())
         {
             case ".sln":
                 if (File.Exists(location))
                 {
-                    await launcher(VISUAL_STUDIO, location);
+                    target = "\"" + location + "\"";
+                    await launcher(VISUAL_STUDIO, target);
                     found = true;
                 }
                 break;
 
             case ".exe":
-                await launcher(location);
+                target = "\"" + location + "\"";
+                await launcher(target);
                 found = true;
-                break;
+                return;
 
             case ".pdf":
-                string target = "\"" + location + "\"";
+                target = "\"" + location + "\"";
                 await launcher(CHROME, target);
                 found = true;
                 break;
 
             case ".md":
-                await processMarkdownFile(location);
+                target = "\"" + location + "\"";
+                await processMarkdownFile(target);
                 found = true;
                 break;
         }
@@ -771,7 +829,7 @@ public partial class Form1 : Form
             }
             else
             {
-                await launchProcess(commandLine);
+                //await launchProcess(commandLine);
             }
         }
         catch (Exception ex)
@@ -843,29 +901,6 @@ public partial class Form1 : Form
         validateLocations();
     }
 
-    private async void deleteCurrentRowToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-        //MessageBox.Show("Delete current row");
-        DialogResult dr = MessageBox.Show("Are sure you want to the selected row?",
-                     "Confirm row deletion", MessageBoxButtons.YesNo);
-
-        if (dr == DialogResult.Yes)
-        {
-            await deleteCatalog(currentCatalog);
-
-            DataGridViewRow row = datagridviewLocations.Rows[currentGridRowIndex];
-
-            string removedShortName = row.Cells["colShortName"].Value.ToString();
-
-            datagridviewLocations.Rows.RemoveAt(currentGridRowIndex);
-
-            showToast("This row was removed:",
-                      "{removedShortName}",
-                      Toast.ToastPosition.LOWER_LEFT,
-                      Toast.ToastDuration.SHORT,
-                      Toast.ToastStatus.INFO);
-        }
-    }
 
     private void textboxHashtags_KeyDown(object sender, KeyEventArgs e)
     {
@@ -966,7 +1001,14 @@ public partial class Form1 : Form
 
     private void datagridviewLocations_DragEnter(object sender, DragEventArgs e)
     {
-        if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        if (e.Data.GetDataPresent(DataFormats.FileDrop) ||
+                 e.Data.GetDataPresent(DataFormats.Text) ||
+                 e.Data.GetDataPresent(DataFormats.UnicodeText))
+        {
+            e.Effect = DragDropEffects.Copy;
+        }
+
+        //if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
     }
 
     private void datagridviewLocations_DragDrop(object sender, DragEventArgs e)
@@ -1039,15 +1081,78 @@ public partial class Form1 : Form
         if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
     }
 
+    //protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+    //    {
+    //        // Check if Alt + A is pressed
+    //        if (keyData == (Keys.Alt | Keys.A))
+    //        {
+    //            MessageBox.Show("Alt + A was pressed!");
+    //            return true; // Indicate that the key event was handled
+    //        }
+
+    //        // Call the base method for other key presses
+    //        return base.ProcessCmdKey(ref msg, keyData);
+    //    }
+
     private async void Form1_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Escape)
         {
             // Handle Escape key press
-            //MessageBox.Show("Escape key pressed!");
+            // MessageBox.Show("Escape key pressed!");
             e.Handled = true; // Indicate that the key press has been handled
             await clearFilter();
         }
+
+        //if (e.Control && e.KeyCode == Keys.A)
+        //{
+        //    MessageBox.Show("You pressed Control + A!");
+        //}
     }
 
+    private void Form1_KeyUp(object sender, KeyEventArgs e)
+    {
+        //if (e.KeyCode == Keys.ControlKey)
+        //{
+        //    //isControlPressed = false;
+        //}
+    }
+
+    private void Form1_KeyPress(object sender, KeyPressEventArgs e)
+    {
+        //if (isControlPressed && e.KeyChar == 'a')
+        //{
+        //    MessageBox.Show("You pressed Control + a!");
+        //}
+    }
+
+    private void setAddModeToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        setAddItemMode();
+        //MessageBox.Show("A");
+    }
+
+    private async void deleteCurrentRowToolStripMenuItem1_Click(object sender, EventArgs e)
+    {
+        //MessageBox.Show("Delete current row");
+        DialogResult dr = MessageBox.Show("Are sure you want to the selected row?",
+                     "Confirm row deletion", MessageBoxButtons.YesNo);
+
+        if (dr == DialogResult.Yes)
+        {
+            await deleteCatalog(currentCatalog);
+
+            DataGridViewRow row = datagridviewLocations.Rows[currentGridRowIndex];
+
+            string removedShortName = row.Cells["colShortName"].Value.ToString();
+
+            datagridviewLocations.Rows.RemoveAt(currentGridRowIndex);
+
+            showToast("This row was removed:",
+                      $"{removedShortName}",
+                      Toast.ToastPosition.LOWER_LEFT,
+                      Toast.ToastDuration.SHORT,
+                      Toast.ToastStatus.INFO);
+        }
+    }
 }

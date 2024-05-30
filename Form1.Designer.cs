@@ -46,12 +46,6 @@
             textboxUrl = new TextBox();
             linkLabel1 = new LinkLabel();
             linklabelOpenLocation = new LinkLabel();
-            panelUpdateButtons = new Panel();
-            buttonUpdate = new Button();
-            linklabelUpdateMode = new LinkLabel();
-            panelAddButtons = new Panel();
-            linklabelCancelAdd = new LinkLabel();
-            buttonAdd = new Button();
             textboxLocation = new TextBox();
             label5 = new Label();
             label4 = new Label();
@@ -61,18 +55,26 @@
             textboxDescription = new TextBox();
             textboxHashtags = new TextBox();
             textboxName = new TextBox();
+            panelUpdateButtons = new Panel();
+            buttonUpdate = new Button();
+            linklabelUpdateMode = new LinkLabel();
+            panelAddButtons = new Panel();
+            linklabelCancelAdd = new LinkLabel();
+            buttonAdd = new Button();
             textboxFilter = new TextBox();
             linklabelFilter = new LinkLabel();
             notifyIcon1 = new NotifyIcon(components);
             menuStrip1 = new MenuStrip();
             mainToolStripMenuItem = new ToolStripMenuItem();
             validateLocationsToolStripMenuItem = new ToolStripMenuItem();
-            deleteCurrentRowToolStripMenuItem = new ToolStripMenuItem();
             refeshListToolStripMenuItem = new ToolStripMenuItem();
             menuItemFavorites = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             makeLocationAFavoriteToolStripMenuItem = new ToolStripMenuItem();
             manageFavoritesToolStripMenuItem = new ToolStripMenuItem();
+            actionsToolStripMenuItem = new ToolStripMenuItem();
+            setAddModeToolStripMenuItem = new ToolStripMenuItem();
+            deleteCurrentRowToolStripMenuItem1 = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)datagridviewLocations).BeginInit();
             panel1.SuspendLayout();
             panelUpdateButtons.SuspendLayout();
@@ -107,7 +109,7 @@
             dataGridViewCellStyle5.Font = new Font("Segoe UI", 11F);
             dataGridViewCellStyle5.ForeColor = SystemColors.ControlText;
             dataGridViewCellStyle5.Padding = new Padding(5);
-            dataGridViewCellStyle5.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionBackColor = Color.Navy;
             dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
             dataGridViewCellStyle5.WrapMode = DataGridViewTriState.False;
             datagridviewLocations.DefaultCellStyle = dataGridViewCellStyle5;
@@ -190,8 +192,6 @@
             panel1.Controls.Add(textboxUrl);
             panel1.Controls.Add(linkLabel1);
             panel1.Controls.Add(linklabelOpenLocation);
-            panel1.Controls.Add(panelUpdateButtons);
-            panel1.Controls.Add(panelAddButtons);
             panel1.Controls.Add(textboxLocation);
             panel1.Controls.Add(label5);
             panel1.Controls.Add(label4);
@@ -210,12 +210,13 @@
             // 
             textboxUrl.AllowDrop = true;
             textboxUrl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textboxUrl.BackColor = Color.LightGoldenrodYellow;
-            textboxUrl.Font = new Font("Segoe UI", 11.14286F);
+            textboxUrl.BackColor = Color.Cornsilk;
+            textboxUrl.Font = new Font("Microsoft Sans Serif", 13.875F);
+            textboxUrl.ForeColor = Color.DarkSlateBlue;
             textboxUrl.Location = new Point(0, 216);
             textboxUrl.Name = "textboxUrl";
             textboxUrl.ReadOnly = true;
-            textboxUrl.Size = new Size(1142, 37);
+            textboxUrl.Size = new Size(1142, 39);
             textboxUrl.TabIndex = 18;
             textboxUrl.TabStop = false;
             textboxUrl.DragDrop += textboxUrl_DragDrop;
@@ -247,96 +248,18 @@
             linklabelOpenLocation.Text = "Open location";
             linklabelOpenLocation.LinkClicked += linklabelOpenLocation_LinkClicked;
             // 
-            // panelUpdateButtons
-            // 
-            panelUpdateButtons.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            panelUpdateButtons.Controls.Add(buttonUpdate);
-            panelUpdateButtons.Controls.Add(linklabelUpdateMode);
-            panelUpdateButtons.Location = new Point(765, 1046);
-            panelUpdateButtons.Name = "panelUpdateButtons";
-            panelUpdateButtons.Size = new Size(376, 63);
-            panelUpdateButtons.TabIndex = 4;
-            // 
-            // buttonUpdate
-            // 
-            buttonUpdate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonUpdate.Enabled = false;
-            buttonUpdate.Font = new Font("Segoe UI", 12F);
-            buttonUpdate.Location = new Point(190, 3);
-            buttonUpdate.Name = "buttonUpdate";
-            buttonUpdate.Size = new Size(179, 53);
-            buttonUpdate.TabIndex = 5;
-            buttonUpdate.Tag = "update";
-            buttonUpdate.Text = "Update";
-            buttonUpdate.UseVisualStyleBackColor = true;
-            buttonUpdate.Click += buttonUpdate_Click;
-            // 
-            // linklabelUpdateMode
-            // 
-            linklabelUpdateMode.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            linklabelUpdateMode.AutoSize = true;
-            linklabelUpdateMode.Font = new Font("Segoe UI", 12F);
-            linklabelUpdateMode.LinkColor = Color.WhiteSmoke;
-            linklabelUpdateMode.Location = new Point(5, 16);
-            linklabelUpdateMode.Name = "linklabelUpdateMode";
-            linklabelUpdateMode.Size = new Size(167, 32);
-            linklabelUpdateMode.TabIndex = 4;
-            linklabelUpdateMode.TabStop = true;
-            linklabelUpdateMode.Tag = "enable";
-            linklabelUpdateMode.Text = "Enable update";
-            linklabelUpdateMode.LinkClicked += linklabelUpdateMode_LinkClicked_1;
-            // 
-            // panelAddButtons
-            // 
-            panelAddButtons.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            panelAddButtons.Controls.Add(linklabelCancelAdd);
-            panelAddButtons.Controls.Add(buttonAdd);
-            panelAddButtons.Location = new Point(389, 1046);
-            panelAddButtons.Name = "panelAddButtons";
-            panelAddButtons.Size = new Size(376, 63);
-            panelAddButtons.TabIndex = 5;
-            panelAddButtons.Visible = false;
-            // 
-            // linklabelCancelAdd
-            // 
-            linklabelCancelAdd.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            linklabelCancelAdd.AutoSize = true;
-            linklabelCancelAdd.Font = new Font("Segoe UI", 12F);
-            linklabelCancelAdd.LinkColor = Color.WhiteSmoke;
-            linklabelCancelAdd.Location = new Point(49, 21);
-            linklabelCancelAdd.Name = "linklabelCancelAdd";
-            linklabelCancelAdd.Size = new Size(132, 32);
-            linklabelCancelAdd.TabIndex = 7;
-            linklabelCancelAdd.TabStop = true;
-            linklabelCancelAdd.Tag = "enable";
-            linklabelCancelAdd.Text = "Cancel add";
-            linklabelCancelAdd.LinkClicked += linklabelCancelAdd_LinkClicked;
-            // 
-            // buttonAdd
-            // 
-            buttonAdd.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonAdd.BackColor = Color.ForestGreen;
-            buttonAdd.Font = new Font("Segoe UI", 12F);
-            buttonAdd.ForeColor = Color.WhiteSmoke;
-            buttonAdd.Location = new Point(193, 7);
-            buttonAdd.Name = "buttonAdd";
-            buttonAdd.Size = new Size(180, 53);
-            buttonAdd.TabIndex = 6;
-            buttonAdd.Tag = "Add";
-            buttonAdd.Text = "Add";
-            buttonAdd.UseVisualStyleBackColor = false;
-            buttonAdd.Click += buttonAdd_Click;
-            // 
             // textboxLocation
             // 
             textboxLocation.AllowDrop = true;
             textboxLocation.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textboxLocation.BackColor = Color.LightGoldenrodYellow;
-            textboxLocation.Font = new Font("Segoe UI", 11.14286F);
+            textboxLocation.BackColor = Color.Cornsilk;
+            textboxLocation.BorderStyle = BorderStyle.None;
+            textboxLocation.Font = new Font("Microsoft Sans Serif", 13.875F);
+            textboxLocation.ForeColor = Color.DarkSlateBlue;
             textboxLocation.Location = new Point(0, 126);
             textboxLocation.Name = "textboxLocation";
             textboxLocation.ReadOnly = true;
-            textboxLocation.Size = new Size(1139, 37);
+            textboxLocation.Size = new Size(1142, 32);
             textboxLocation.TabIndex = 14;
             textboxLocation.TabStop = false;
             textboxLocation.DragDrop += textboxLocation_DragDrop;
@@ -401,8 +324,9 @@
             // textboxDescription
             // 
             textboxDescription.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textboxDescription.BackColor = Color.LightGoldenrodYellow;
-            textboxDescription.Font = new Font("Segoe UI", 11.14286F);
+            textboxDescription.BackColor = Color.Cornsilk;
+            textboxDescription.Font = new Font("Consolas", 11.5F);
+            textboxDescription.ForeColor = Color.DarkSlateBlue;
             textboxDescription.Location = new Point(0, 392);
             textboxDescription.Multiline = true;
             textboxDescription.Name = "textboxDescription";
@@ -415,12 +339,13 @@
             // textboxHashtags
             // 
             textboxHashtags.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textboxHashtags.BackColor = Color.LightGoldenrodYellow;
-            textboxHashtags.Font = new Font("Segoe UI", 11.14286F);
+            textboxHashtags.BackColor = Color.Cornsilk;
+            textboxHashtags.Font = new Font("Microsoft Sans Serif", 13.875F);
+            textboxHashtags.ForeColor = Color.DarkSlateBlue;
             textboxHashtags.Location = new Point(3, 304);
             textboxHashtags.Name = "textboxHashtags";
             textboxHashtags.ReadOnly = true;
-            textboxHashtags.Size = new Size(1136, 37);
+            textboxHashtags.Size = new Size(1136, 39);
             textboxHashtags.TabIndex = 8;
             textboxHashtags.TabStop = false;
             textboxHashtags.Click += textboxHashtags_Click;
@@ -429,20 +354,104 @@
             // textboxName
             // 
             textboxName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textboxName.BackColor = Color.LightGoldenrodYellow;
-            textboxName.Font = new Font("Segoe UI", 11.14286F);
+            textboxName.BackColor = Color.Cornsilk;
+            textboxName.Font = new Font("Microsoft Sans Serif", 13.875F);
+            textboxName.ForeColor = Color.DarkSlateBlue;
             textboxName.Location = new Point(3, 36);
             textboxName.Name = "textboxName";
             textboxName.ReadOnly = true;
-            textboxName.Size = new Size(1139, 37);
+            textboxName.Size = new Size(1139, 39);
             textboxName.TabIndex = 7;
             textboxName.TabStop = false;
             textboxName.Leave += textboxName_Leave;
             // 
+            // panelUpdateButtons
+            // 
+            panelUpdateButtons.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            panelUpdateButtons.Controls.Add(buttonUpdate);
+            panelUpdateButtons.Controls.Add(linklabelUpdateMode);
+            panelUpdateButtons.Location = new Point(24, 47);
+            panelUpdateButtons.Name = "panelUpdateButtons";
+            panelUpdateButtons.Size = new Size(376, 63);
+            panelUpdateButtons.TabIndex = 4;
+            // 
+            // buttonUpdate
+            // 
+            buttonUpdate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonUpdate.Enabled = false;
+            buttonUpdate.Font = new Font("Segoe UI", 12F);
+            buttonUpdate.Location = new Point(190, 3);
+            buttonUpdate.Name = "buttonUpdate";
+            buttonUpdate.Size = new Size(179, 53);
+            buttonUpdate.TabIndex = 5;
+            buttonUpdate.Tag = "update";
+            buttonUpdate.Text = "Update";
+            buttonUpdate.UseVisualStyleBackColor = true;
+            buttonUpdate.Visible = false;
+            buttonUpdate.Click += buttonUpdate_Click;
+            // 
+            // linklabelUpdateMode
+            // 
+            linklabelUpdateMode.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            linklabelUpdateMode.AutoSize = true;
+            linklabelUpdateMode.Font = new Font("Segoe UI", 12F);
+            linklabelUpdateMode.LinkColor = Color.WhiteSmoke;
+            linklabelUpdateMode.Location = new Point(5, 16);
+            linklabelUpdateMode.Name = "linklabelUpdateMode";
+            linklabelUpdateMode.Size = new Size(167, 32);
+            linklabelUpdateMode.TabIndex = 4;
+            linklabelUpdateMode.TabStop = true;
+            linklabelUpdateMode.Tag = "enable";
+            linklabelUpdateMode.Text = "Enable update";
+            linklabelUpdateMode.LinkClicked += linklabelUpdateMode_LinkClicked_1;
+            // 
+            // panelAddButtons
+            // 
+            panelAddButtons.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            panelAddButtons.Controls.Add(linklabelCancelAdd);
+            panelAddButtons.Controls.Add(buttonAdd);
+            panelAddButtons.Location = new Point(406, 47);
+            panelAddButtons.Name = "panelAddButtons";
+            panelAddButtons.Size = new Size(376, 63);
+            panelAddButtons.TabIndex = 5;
+            panelAddButtons.Visible = false;
+            // 
+            // linklabelCancelAdd
+            // 
+            linklabelCancelAdd.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            linklabelCancelAdd.AutoSize = true;
+            linklabelCancelAdd.Font = new Font("Segoe UI", 12F);
+            linklabelCancelAdd.LinkColor = Color.WhiteSmoke;
+            linklabelCancelAdd.Location = new Point(49, 21);
+            linklabelCancelAdd.Name = "linklabelCancelAdd";
+            linklabelCancelAdd.Size = new Size(132, 32);
+            linklabelCancelAdd.TabIndex = 7;
+            linklabelCancelAdd.TabStop = true;
+            linklabelCancelAdd.Tag = "enable";
+            linklabelCancelAdd.Text = "Cancel add";
+            linklabelCancelAdd.LinkClicked += linklabelCancelAdd_LinkClicked;
+            // 
+            // buttonAdd
+            // 
+            buttonAdd.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonAdd.BackColor = Color.ForestGreen;
+            buttonAdd.Font = new Font("Segoe UI", 12F);
+            buttonAdd.ForeColor = Color.WhiteSmoke;
+            buttonAdd.Location = new Point(193, 7);
+            buttonAdd.Name = "buttonAdd";
+            buttonAdd.Size = new Size(180, 53);
+            buttonAdd.TabIndex = 6;
+            buttonAdd.Tag = "Add";
+            buttonAdd.Text = "Add";
+            buttonAdd.UseVisualStyleBackColor = false;
+            buttonAdd.Click += buttonAdd_Click;
+            // 
             // textboxFilter
             // 
             textboxFilter.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textboxFilter.Font = new Font("Segoe UI", 12F);
+            textboxFilter.BackColor = Color.Cornsilk;
+            textboxFilter.Font = new Font("Microsoft Sans Serif", 13.875F);
+            textboxFilter.ForeColor = Color.DarkSlateBlue;
             textboxFilter.Location = new Point(2099, 64);
             textboxFilter.Margin = new Padding(2);
             textboxFilter.Name = "textboxFilter";
@@ -482,7 +491,7 @@
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(28, 28);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { mainToolStripMenuItem, menuItemFavorites });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { mainToolStripMenuItem, menuItemFavorites, actionsToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(5, 2, 0, 2);
@@ -492,7 +501,7 @@
             // 
             // mainToolStripMenuItem
             // 
-            mainToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { validateLocationsToolStripMenuItem, deleteCurrentRowToolStripMenuItem, refeshListToolStripMenuItem });
+            mainToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { validateLocationsToolStripMenuItem, refeshListToolStripMenuItem });
             mainToolStripMenuItem.Name = "mainToolStripMenuItem";
             mainToolStripMenuItem.Size = new Size(67, 29);
             mainToolStripMenuItem.Text = "Main";
@@ -500,21 +509,14 @@
             // validateLocationsToolStripMenuItem
             // 
             validateLocationsToolStripMenuItem.Name = "validateLocationsToolStripMenuItem";
-            validateLocationsToolStripMenuItem.Size = new Size(259, 34);
+            validateLocationsToolStripMenuItem.Size = new Size(252, 34);
             validateLocationsToolStripMenuItem.Text = "Validate locations";
             validateLocationsToolStripMenuItem.Click += validateLocationsToolStripMenuItem_Click;
-            // 
-            // deleteCurrentRowToolStripMenuItem
-            // 
-            deleteCurrentRowToolStripMenuItem.Name = "deleteCurrentRowToolStripMenuItem";
-            deleteCurrentRowToolStripMenuItem.Size = new Size(259, 34);
-            deleteCurrentRowToolStripMenuItem.Text = "Delete current row";
-            deleteCurrentRowToolStripMenuItem.Click += deleteCurrentRowToolStripMenuItem_Click;
             // 
             // refeshListToolStripMenuItem
             // 
             refeshListToolStripMenuItem.Name = "refeshListToolStripMenuItem";
-            refeshListToolStripMenuItem.Size = new Size(259, 34);
+            refeshListToolStripMenuItem.Size = new Size(252, 34);
             refeshListToolStripMenuItem.Text = "Refesh list";
             refeshListToolStripMenuItem.Click += refeshListToolStripMenuItem_Click;
             // 
@@ -547,24 +549,50 @@
             manageFavoritesToolStripMenuItem.Text = "Manage favorites";
             manageFavoritesToolStripMenuItem.Click += manageFavoritesToolStripMenuItem_Click;
             // 
+            // actionsToolStripMenuItem
+            // 
+            actionsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { setAddModeToolStripMenuItem, deleteCurrentRowToolStripMenuItem1 });
+            actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
+            actionsToolStripMenuItem.Size = new Size(87, 29);
+            actionsToolStripMenuItem.Text = "Actions";
+            // 
+            // setAddModeToolStripMenuItem
+            // 
+            setAddModeToolStripMenuItem.Name = "setAddModeToolStripMenuItem";
+            setAddModeToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.A;
+            setAddModeToolStripMenuItem.Size = new Size(285, 34);
+            setAddModeToolStripMenuItem.Text = "Set add mode";
+            setAddModeToolStripMenuItem.Click += setAddModeToolStripMenuItem_Click;
+            // 
+            // deleteCurrentRowToolStripMenuItem1
+            // 
+            deleteCurrentRowToolStripMenuItem1.Name = "deleteCurrentRowToolStripMenuItem1";
+            deleteCurrentRowToolStripMenuItem1.Size = new Size(285, 34);
+            deleteCurrentRowToolStripMenuItem1.Text = "Delete current row";
+            deleteCurrentRowToolStripMenuItem1.Click += deleteCurrentRowToolStripMenuItem1_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.MidnightBlue;
+            BackColor = Color.Navy;
             ClientSize = new Size(2482, 1290);
             Controls.Add(textboxFilter);
             Controls.Add(linklabelFilter);
             Controls.Add(panel1);
+            Controls.Add(panelUpdateButtons);
             Controls.Add(datagridviewLocations);
+            Controls.Add(panelAddButtons);
             Controls.Add(menuStrip1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Name = "Form1";
-            Text = "Project Catalog v10.0.8";
+            Text = "Project Catalog v10.0.10";
             FormClosing += Form1_FormClosing;
             Load += Form1_Load;
             KeyDown += Form1_KeyDown;
+            KeyPress += Form1_KeyPress;
+            KeyUp += Form1_KeyUp;
             Resize += Form1_Resize;
             ((System.ComponentModel.ISupportInitialize)datagridviewLocations).EndInit();
             panel1.ResumeLayout(false);
@@ -606,7 +634,6 @@
         private MenuStrip menuStrip1;
         private ToolStripMenuItem mainToolStripMenuItem;
         private ToolStripMenuItem validateLocationsToolStripMenuItem;
-        private ToolStripMenuItem deleteCurrentRowToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem manageFavoritesToolStripMenuItem;
         public ToolStripMenuItem menuItemFavorites;
@@ -617,5 +644,8 @@
         private DataGridViewTextBoxColumn colShortName;
         private DataGridViewTextBoxColumn col_location;
         private DataGridViewTextBoxColumn tags;
+        private ToolStripMenuItem actionsToolStripMenuItem;
+        private ToolStripMenuItem setAddModeToolStripMenuItem;
+        private ToolStripMenuItem deleteCurrentRowToolStripMenuItem1;
     }
 }
