@@ -358,40 +358,45 @@ public partial class Form1 : Form
 
     private async void ItemDroppedForAdd(DragEventArgs e)
     {
-
         if (linklabelFilter.Text != "Filter")
         {
-
             await clearFilter();
-            //showToast("Clear filter first",
-            //          $"Clear filter before adding a location",
-            //          Toast.ToastPosition.LOWER_LEFT,
-            //          Toast.ToastDuration.SHORT,
-            //          Toast.ToastStatus.INFO);
-
-            //return;
         }
 
-        string file = "";
+        bool singleItem = true;
+        string draggedItem = "";
 
-        if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            file = files[0];
-        }
+        //if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+        //    string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+        //    file = files[0];
+        //}
 
-        if (e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent(DataFormats.UnicodeText))
+        //if (e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent(DataFormats.UnicodeText))
+        //{
+        //    string url = (string)e.Data.GetData(DataFormats.Text);
+        //    file = url;
+        //}
+
+        if (e.Data.GetDataPresent(DataFormats.FileDrop)) 
         {
-            string url = (string)e.Data.GetData(DataFormats.Text);
-            file = url;
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            draggedItem = files[0];
+            singleItem = true;
+        }
+        else if  (e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent(DataFormats.UnicodeText)) 
+        { 
+            string text = (string)e.Data.GetData(DataFormats.Text);
+            draggedItem = text;
+
+            singleItem = draggedItem.ToLower().StartsWith("http");
         }
 
-        Catalog existingCatalog = IsCatalogRegistered(file);
+        Catalog existingCatalog = IsCatalogRegistered(draggedItem);
         if (existingCatalog is not null)
         {
             selectRowWithLocation(existingCatalog.Location);
             currentCatalog = existingCatalog;
             await refreshDetailPanel();
-            //MessageBox.Show("already registered");
 
             showToast("Location aleady exists",
                       $"That location has been made the current location",
@@ -409,7 +414,15 @@ public partial class Form1 : Form
                   Toast.ToastStatus.INFO);
 
         setAddItemMode();
-        textboxLocation.Text = file;
+
+        if (singleItem)
+        {
+            textboxLocation.Text = draggedItem;
+        }
+        else
+        {
+            textboxDescription.Text = draggedItem;
+        }
     }
 
     private void setAddItemMode()
