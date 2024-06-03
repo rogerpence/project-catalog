@@ -47,6 +47,8 @@ public partial class Form1 : Form
 
         repo = new Repository(dapperProvider);
 
+        this.Text = ConfigurationManager.AppSettings["version_number"];
+
         string connectionString = ConfigurationManager.ConnectionStrings["SQLServer"].ConnectionString;
 
         datagridviewLocations.AutoGenerateColumns = false;
@@ -222,9 +224,9 @@ public partial class Form1 : Form
         textboxFilter.Text = "";
     }
 
-    private void saveLocations()
+    private async void saveLocations()
     {
-        clearFilter();
+        await clearFilter();
     }
 
     public async void GetHashTags()
@@ -346,7 +348,7 @@ public partial class Form1 : Form
         {
             e.Effect = DragDropEffects.Copy;
         }
-        
+
 
         //if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
     }
@@ -377,14 +379,14 @@ public partial class Form1 : Form
         //    file = url;
         //}
 
-        if (e.Data.GetDataPresent(DataFormats.FileDrop)) 
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             draggedItem = files[0];
             singleItem = true;
         }
-        else if  (e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent(DataFormats.UnicodeText)) 
-        { 
+        else if (e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent(DataFormats.UnicodeText))
+        {
             string text = (string)e.Data.GetData(DataFormats.Text);
             draggedItem = text;
 
@@ -507,51 +509,7 @@ public partial class Form1 : Form
         }
     }
 
-    private async void buttonAdd_Click(object sender, EventArgs e)
-    {
-        // Add operation.
-        Catalog catalog = new Catalog();
-        catalog.id = 0;
-        catalog.Description = textboxDescription.Text;
-        catalog.Tags = textboxHashtags.Text;
-        catalog.ShortName = textboxName.Text;
-        catalog.Location = textboxLocation.Text;
-        catalog.Favorite = false;
-        catalog.FavoriteRank = 0;
-
-        catalog.Url = textboxUrl.Text;
-        catalog.Dateadded = DateTime.Now;
-
-        var catalogJustAdded = await repo.Upsert<Catalog>(catalog);
-        catalogList.Add(catalogJustAdded);
-
-
-        catalogList = catalogList.OrderBy(o => o.ShortName).ToList();
-        bindingList = new BindingList<Catalog>(catalogList);
-        datagridviewLocations.DataSource = bindingList;
-
-
-        toggleReadOnlyStatus();
-        toggleAddUpdatePanels();
-        //selectRowWithLocation(catalog.Location);
-        //currentCatalog = catalog;
-        //refreshDetailPanel();
-        // Scroll selected row into view.
-        //datagridviewLocations.FirstDisplayedScrollingRowIndex = datagridviewLocations.SelectedRows[0].Index;
-
-        showToast("Add successful",
-                    $"{catalog.ShortName} added",
-                    Toast.ToastPosition.LOWER_LEFT,
-                    Toast.ToastDuration.SHORT,
-                    Toast.ToastStatus.SUCCESS,
-                    true);
-
-        selectRowWithLocation(catalog.Location);
-        currentCatalog = catalogJustAdded;
-        await refreshDetailPanel();
-    }
-
-    private async void linklabelCancelAdd_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    private async void ddddlinklabelCancelAdd_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
         linklabelUpdateMode.Tag = "disable";
         toggleReadOnlyStatus();
@@ -859,7 +817,7 @@ public partial class Form1 : Form
         toggleFilter();
     }
 
-    private void toggleFilter()
+    private async void toggleFilter()
     {
         if (linklabelFilter.Text == "Filter")
         {
@@ -871,7 +829,7 @@ public partial class Form1 : Form
         }
         else
         {
-            clearFilter();
+            await clearFilter();
         }
     }
 
@@ -1167,5 +1125,75 @@ public partial class Form1 : Form
                       Toast.ToastDuration.SHORT,
                       Toast.ToastStatus.INFO);
         }
+    }
+
+    private async void linklabelCancelAdd_LinkClicked_1(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        linklabelUpdateMode.Tag = "disable";
+        toggleReadOnlyStatus();
+
+        toggleAddUpdatePanels();
+
+        LinkLabel lbl = (LinkLabel)sender;
+
+        if (lbl.Text.ToLower().Contains("cancel"))
+        {
+            buttonAdd.Visible = false;
+        }
+        else
+        {
+            buttonAdd.Visible = true;
+        }
+
+
+        await refreshDetailPanel();
+
+        buttonUpdate.BackColor = Color.LightBlue;
+        buttonUpdate.ForeColor = Color.Black;
+    }
+
+    private async void buttonAdd_Click_1(object sender, EventArgs e)
+    {
+        // Add operation.
+        Catalog catalog = new Catalog();
+        catalog.id = 0;
+        catalog.Description = textboxDescription.Text;
+        catalog.Tags = textboxHashtags.Text;
+        catalog.ShortName = textboxName.Text;
+        catalog.Location = textboxLocation.Text;
+        catalog.Favorite = false;
+        catalog.FavoriteRank = 0;
+
+        catalog.Url = textboxUrl.Text;
+        catalog.Dateadded = DateTime.Now;
+
+        var catalogJustAdded = await repo.Upsert<Catalog>(catalog);
+        catalogList.Add(catalogJustAdded);
+
+
+        catalogList = catalogList.OrderBy(o => o.ShortName).ToList();
+        bindingList = new BindingList<Catalog>(catalogList);
+        datagridviewLocations.DataSource = bindingList;
+
+
+        toggleReadOnlyStatus();
+        toggleAddUpdatePanels();
+        //selectRowWithLocation(catalog.Location);
+        //currentCatalog = catalog;
+        //refreshDetailPanel();
+        // Scroll selected row into view.
+        //datagridviewLocations.FirstDisplayedScrollingRowIndex = datagridviewLocations.SelectedRows[0].Index;
+
+        showToast("Add successful",
+                    $"{catalog.ShortName} added",
+                    Toast.ToastPosition.LOWER_LEFT,
+                    Toast.ToastDuration.SHORT,
+                    Toast.ToastStatus.SUCCESS,
+                    true);
+
+        selectRowWithLocation(catalog.Location);
+        currentCatalog = catalogJustAdded;
+        await refreshDetailPanel();
+
     }
 }
