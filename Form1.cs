@@ -449,6 +449,9 @@ public partial class Form1 : Form
 
         toggleAddUpdatePanels();
 
+        panelAddButtons.Visible = true;
+        buttonAdd.Visible = true;
+
         textboxName.Focus();
     }
 
