@@ -1,0 +1,8 @@
+{
+    "visual_studio": "Roger Pence",
+    "markdown_opener": "C:\\Users\\thumb\\Documents\\projects\\rpUtilities\\librettox\\template_work\\schemas",
+    "storedProcsTemplatePath": "C:\\Users\\thumb\\Documents\\projects\\rpUtilities\\librettox\\template_work\\schemas",
+    "version_number": "3.1.14",
+    "SqlServer": "Data Source=.;Initial Catalog=ProjectCatalog;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+}
+

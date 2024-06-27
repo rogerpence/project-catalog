@@ -11,11 +11,13 @@ using CliWrap;
 using System.Diagnostics;
 using Markdig;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Microsoft.Extensions.Configuration;
 
 namespace ProjectDiary;
 
 public partial class Form1 : Form
 {
+
     List<Catalog> catalogList = null;
 
     BindingList<Catalog> bindingList;
@@ -47,9 +49,9 @@ public partial class Form1 : Form
 
         repo = new Repository(dapperProvider);
 
-        this.Text = ConfigurationManager.AppSettings["version_number"];
+        this.Text = System.Configuration.ConfigurationManager.AppSettings["version_number"];
 
-        string connectionString = ConfigurationManager.ConnectionStrings["SQLServer"].ConnectionString;
+        string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SQLServer"].ConnectionString;
 
         datagridviewLocations.AutoGenerateColumns = false;
 
@@ -236,6 +238,14 @@ public partial class Form1 : Form
 
     private async void Form1_Load(object sender, EventArgs e)
     {
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("config.json")
+            .Build();
+
+        
+       string? vs = config["visual_studio"] ?? null;
+
+ 
         textboxFilter.Select();
 
         await readSavedLocations(true);
@@ -488,6 +498,8 @@ public partial class Form1 : Form
 
     private async void buttonUpdate_Click(object sender, EventArgs e)
     {
+        if (!validateInput()) return;
+
         // Update operation.
         if (buttonUpdate.Tag.ToString() == "update")
         {
@@ -1152,8 +1164,61 @@ public partial class Form1 : Form
         buttonUpdate.ForeColor = Color.Black;
     }
 
+    private bool validateInput()
+    {
+        if (textboxName.Text.Trim() == "")
+        {
+            showToast("Input error:",
+                      "The 'Name' field is required",
+                      Toast.ToastPosition.LOWER_LEFT,
+                      Toast.ToastDuration.SHORT,
+                      Toast.ToastStatus.ERROR);
+            textboxName.Focus();
+            return false;
+        }
+
+        if (textboxDescription.Text.Trim() == "")
+        {
+            showToast("Input error:",
+                      "The 'Description' field is required",
+                      Toast.ToastPosition.LOWER_LEFT,
+                      Toast.ToastDuration.SHORT,
+                      Toast.ToastStatus.ERROR);
+            textboxDescription.Focus();
+            return false;
+        }
+
+        if (textboxLocation.Text.Trim() == "")
+        {
+            showToast("Input error:",
+                      "The 'Location' field is required",
+                      Toast.ToastPosition.LOWER_LEFT,
+                      Toast.ToastDuration.SHORT,
+                      Toast.ToastStatus.ERROR);
+            textboxLocation.Focus();
+            return false;
+        }
+
+
+        if (textboxHashtags.Text.Trim() == "")
+        {
+            showToast("Input error:",
+                      "At least one tag is required",
+                      Toast.ToastPosition.LOWER_LEFT,
+                      Toast.ToastDuration.SHORT,
+                      Toast.ToastStatus.ERROR);
+            textboxHashtags.Focus();
+            return false;
+        }
+
+
+        return true;
+    }
+
     private async void buttonAdd_Click_1(object sender, EventArgs e)
     {
+        if (!validateInput()) return;
+
         // Add operation.
         Catalog catalog = new Catalog();
         catalog.id = 0;
